@@ -1,0 +1,42 @@
+[
+  {
+    "src": "images/8MP.jpeg",
+    "title": "8MP Camera",
+    "description": "High quality 8MP rear camera."
+  },
+  {
+    "src": "images/Arduino Uno R3.jpeg",
+    "title": "Arduino Uno R3",
+    "description": "Popular microcontroller board."
+  },
+  {
+    "src": "images/Buck converter.jpeg",
+    "title": "Buck Converter",
+    "description": "Voltage step-down converter."
+  },
+  {
+    "src": "images/cable.jpeg",
+    "title": "USB Cable",
+    "description": "Fast charging USB cable."
+  },
+  {
+    "src": "images/channel relay module 1.jpeg",
+    "title": "1-Channel Relay Module",
+    "description": "Relay module for switching devices."
+  },
+  {
+    "src": "images/DC-DC step-down buck converter.jpeg",
+    "title": "DC-DC Step-down Buck Converter",
+    "description": "Efficient DC-DC step-down converter."
+  },
+  {
+    "src": "images/ESP-01.jpeg",
+    "title": "ESP-01",
+    "description": "Low-cost Wi-Fi module."
+  },
+  {
+    "src": "images/icd.jpeg",
+    "title": "ICD",
+    "description": "Electronic component."
+  }
+]
