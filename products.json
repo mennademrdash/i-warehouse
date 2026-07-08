@@ -2,41 +2,49 @@
   {
     "src": "images/8MP.jpeg",
     "title": "8MP Camera",
-    "description": "High quality 8MP rear camera."
+    "description": "High quality 8MP rear camera.",
+    "category": "Camera"
   },
   {
     "src": "images/Arduino Uno R3.jpeg",
     "title": "Arduino Uno R3",
-    "description": "Popular microcontroller board."
+    "description": "Popular microcontroller board.",
+    "category": "Camera"
   },
   {
     "src": "images/Buck converter.jpeg",
     "title": "Buck Converter",
-    "description": "Voltage step-down converter."
+    "description": "Voltage step-down converter.",
+    "category": "Microcontroller"
   },
   {
     "src": "images/cable.jpeg",
     "title": "USB Cable",
-    "description": "Fast charging USB cable."
+    "description": "Fast charging USB cable.",
+    "category": "Power Supply"
   },
   {
     "src": "images/channel relay module 1.jpeg",
     "title": "1-Channel Relay Module",
-    "description": "Relay module for switching devices."
+    "description": "Relay module for switching devices.",
+    "category": "Power Supply"
   },
   {
     "src": "images/DC-DC step-down buck converter.jpeg",
     "title": "DC-DC Step-down Buck Converter",
-    "description": "Efficient DC-DC step-down converter."
+    "description": "Efficient DC-DC step-down converter.",
+    "category": "Microcontroller"
   },
   {
     "src": "images/ESP-01.jpeg",
     "title": "ESP-01",
-    "description": "Low-cost Wi-Fi module."
+    "description": "Low-cost Wi-Fi module.",
+    "category": "Microcontroller"
   },
   {
     "src": "images/icd.jpeg",
     "title": "ICD",
-    "description": "Electronic component."
+    "description": "Electronic component.",
+    "category": "Microcontroller"
   }
 ]

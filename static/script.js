@@ -2,44 +2,77 @@ const sidebar = document.getElementById("sidebar");
 const backgroundImage = document.getElementById("backgroundImage");
 const mainTitle = document.getElementById("mainTitle");
 const mainDescription = document.getElementById("mainDescription");
+const categoryFilter = document.getElementById("categoryFilter");
+const searchInput = document.getElementById("searchInput");
+
+let page = 1;
+const limit = 10;
+let category = "";
+let search = "";
 
 function setMainContent(imageSrc, title, description) {
   backgroundImage.style.opacity = "0";
   backgroundImage.style.backgroundImage = "none";
   backgroundImage.style.backgroundImage = `url("/static/${imageSrc}")`;
+
   mainTitle.textContent = title;
   mainDescription.textContent = description;
+
   requestAnimationFrame(() => {
     backgroundImage.style.opacity = "1";
   });
 }
-fetch("/api/products")
-  .then((response) => response.json())
-  .then((images) => {
-    images.forEach(function (image) {
-      const card = document.createElement("div");
-      card.className = "sidebarItem";
 
-      const img = document.createElement("img");
-      img.src = "/static/" + image.src;
-      img.alt = image.title;
+function loadProducts() {
+  fetch(
+    `/api/products?page=${page}&limit=${limit}&category=${category}&search=${search}`,
+  )
+    .then((response) => response.json())
+    .then((images) => {
+      document
+        .querySelectorAll(".sidebarItem")
+        .forEach((item) => item.remove());
 
-      img.onclick = function () {
-        setMainContent(image.src, image.title, image.description);
-      };
+      images.forEach((image) => {
+        const card = document.createElement("div");
+        card.className = "sidebarItem";
 
-      const title = document.createElement("div");
-      title.className = "thumbTitle";
-      title.textContent = image.title;
+        const img = document.createElement("img");
+        img.src = "/static/" + image.src;
+        img.alt = image.title;
 
-      card.appendChild(img);
-      card.appendChild(title);
-      sidebar.appendChild(card);
+        img.onclick = function () {
+          setMainContent(image.src, image.title, image.description);
+        };
+
+        const title = document.createElement("div");
+        title.className = "thumbTitle";
+        title.textContent = image.title;
+
+        card.appendChild(img);
+        card.appendChild(title);
+
+        sidebar.appendChild(card);
+      });
+
+      if (images.length > 0) {
+        setMainContent(images[0].src, images[0].title, images[0].description);
+      }
+    })
+    .catch((error) => {
+      console.error(error);
     });
-    if (images.length > 0) {
-      setMainContent(images[0].src, images[0].title, images[0].description);
-    }
-  })
-  .catch((error) => {
-    console.error("Error loading products:", error);
-  });
+}
+
+categoryFilter.addEventListener("change", function () {
+  category = this.value;
+  page = 1;
+  loadProducts();
+});
+searchInput.addEventListener("input", function () {
+  search = this.value;
+  page = 1;
+  loadProducts();
+});
+
+loadProducts();
