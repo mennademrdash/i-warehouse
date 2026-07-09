@@ -11,30 +11,34 @@ let category = "";
 let search = "";
 
 function setMainContent(imageSrc, title, description) {
-  backgroundImage.style.opacity = "0";
-  backgroundImage.style.backgroundImage = "none";
-  backgroundImage.style.backgroundImage = `url("/static/${imageSrc}")`;
+  //Function btst2bl image w title w description
+  backgroundImage.style.opacity = "0"; //5ly el sora t5tfe (opacity = 0) 3shan n3ml animation
+  backgroundImage.style.backgroundImage = "none"; //Ems7 el sora el adema
+  backgroundImage.style.backgroundImage = `url("/static/${imageSrc}")`; //7ot el sora el gdeda mn folder static
 
   mainTitle.textContent = title;
   mainDescription.textContent = description;
 
   requestAnimationFrame(() => {
-    backgroundImage.style.opacity = "1";
+    // when im cilcking on another pic
+    backgroundImage.style.opacity = "2";
   });
 }
 
 function loadProducts() {
+  //Function btgeb kol el products mn API
   fetch(
-    `/api/products?page=${page}&limit=${limit}&category=${category}&search=${search}`,
+    //Btb3t request ll server 3shan tgeb el data
+    `/api/products?page=${page}&limit=${limit}&category=${category}&search=${search}`, //Bt3ml request ll API w tb3t m3ah page + limit + category + search
   )
-    .then((response) => response.json())
+    .then((response) => response.json()) //lma taklm server ro7 5od data mn server
     .then((images) => {
       document
-        .querySelectorAll(".sidebarItem")
+        .querySelectorAll(".sidebarItem") //Returns all element descendants of node that match selectors.
         .forEach((item) => item.remove());
 
       images.forEach((image) => {
-        const card = document.createElement("div");
+        const card = document.createElement("div"); //he createElement() method of the Document interface creates a new HTMLElement that has the specified localName.
         card.className = "sidebarItem";
 
         const img = document.createElement("img");
@@ -56,7 +60,7 @@ function loadProducts() {
       });
 
       if (images.length > 0) {
-        setMainContent(images[0].src, images[0].title, images[0].description);
+        setMainContent(images[0].src, images[0].title, images[0].description); //hena ba2lo mn img 0 fema akbr a3rf m3ha kolo ba eki a7ddo
       }
     })
     .catch((error) => {
