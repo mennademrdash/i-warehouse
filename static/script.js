@@ -80,3 +80,45 @@ searchInput.addEventListener("input", function () {
 });
 
 loadProducts();
+
+const form = document.querySelector("form");
+
+if (form) {
+  const username = document.querySelector('input[name="username"]');
+  const email = document.querySelector('input[name="email"]');
+  const password = document.querySelector('input[name="password"]');
+
+  form.addEventListener("submit", function (e) {
+    // Remove extra spaces
+    if (username) username.value = username.value.trim();
+    if (email) email.value = email.value.trim();
+
+    // Username Validation
+    if (username && username.value === "") {
+      e.preventDefault();
+      alert("Please enter your username.");
+      username.focus();
+      return;
+    }
+
+    // Email Validation (Register only)
+    if (email) {
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailPattern.test(email.value)) {
+        e.preventDefault();
+        alert("Please enter a valid email.");
+        email.focus();
+        return;
+      }
+    }
+
+    // Password Validation
+    if (password && password.value.length < 8) {
+      e.preventDefault();
+      alert("Password must be at least 8 characters.");
+      password.focus();
+      return;
+    }
+  });
+}

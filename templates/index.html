@@ -14,8 +14,34 @@
   <body>
     <header>
       <h1><span class="logo-i">i</span>-WareHouse</h1>
-    </header>
 
+      <div class="header-right">
+        <span class="welcome"> Welcome, {{ session["username"] }} </span>
+
+        <a href="{{ url_for('auth.logout') }}" class="logout-btn"> Logout </a>
+      </div>
+    </header>
+    <div class="dashboard">
+      <div class="card">
+        <h3>Total Devices</h3>
+        <p>{{ total_devices }}</p>
+      </div>
+
+      <div class="card">
+        <h3>Available</h3>
+        <p>{{ available }}</p>
+      </div>
+
+      <div class="card">
+        <h3>Low Stock</h3>
+        <p>{{ low_stock }}</p>
+      </div>
+
+      <div class="card">
+        <h3>Out Of Stock</h3>
+        <p>{{ out_of_stock }}</p>
+      </div>
+    </div>
     <div class="searchContainer">
       <input type="text" id="searchInput" placeholder="Search products..." />
     </div>
@@ -40,6 +66,7 @@
 
       <div id="content" class="content">
         <div id="backgroundImage"></div>
+
         <div id="contentOverlay"></div>
 
         <div class="contentText">
