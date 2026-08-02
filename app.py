@@ -2,6 +2,10 @@ from flask import Flask, render_template, jsonify, request, session, redirect
 import sqlite3
 import os
 from auth import auth
+import cv2                                         
+from auth import auth, decode_base64_image          
+from hand_gesture.hand_recognition import HandGestureProcessor   
+
 
 app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -16,7 +20,7 @@ def get_db():
 
 app.secret_key = "your_secret_key"
 app.register_blueprint(auth)
-
+hand_processor = HandGestureProcessor()
 
 @app.route("/")
 def home():
@@ -24,46 +28,9 @@ def home():
     if "user_id" not in session:
         return redirect("/login")
 
-    conn = get_db()
-    try:
-        cur = conn.cursor()
-        cur.execute("SELECT quantity FROM devices")
-        rows = cur.fetchall()
-    finally:
-        conn.close()
+    return render_template("index.html")
 
-    quantities = [row["quantity"] or 0 for row in rows]
-    total_products = len(quantities)
-
-    # Dynamic threshold based on the data itself
-    if quantities:
-        average_quantity = sum(quantities) / len(quantities)
-    else:
-        average_quantity = 0
-
-    low_stock_threshold = average_quantity * 0.5 
-
-    available = 0
-    low_stock = 0
-    out_of_stock = 0
-
-    for quantity in quantities:
-        if quantity == 0:
-            out_of_stock += 1
-        elif quantity <= low_stock_threshold:
-            low_stock += 1
-        else:
-            available += 1
-
-    return render_template(
-        "index.html",
-        total_products=total_products,
-        available=available,
-        low_stock=low_stock,
-        out_of_stock=out_of_stock,
-    )
-
-
+    
 # GET
 @app.route("/api/products", methods=["GET"])
 def get_products():
@@ -119,6 +86,24 @@ def get_products():
 
     return jsonify(products[start:end])
 
+@app.route("/api/hand-command", methods=["POST"])
+def hand_command():
+    data = request.get_json()
+
+    if not data or "image" not in data:
+        return jsonify({"command": "NONE"}), 400
+
+    try:
+        rgb_image = decode_base64_image(data["image"])
+    except Exception:
+        return jsonify({"command": "NONE"}), 400
+
+    frame = cv2.cvtColor(rgb_image, cv2.COLOR_RGB2BGR)
+    _, result = hand_processor.process_frame(frame, draw=False)
+
+    return jsonify(result)
+
 
 if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
     app.run(debug=True)

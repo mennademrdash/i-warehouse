@@ -21,27 +21,7 @@
         <a href="{{ url_for('auth.logout') }}" class="logout-btn"> Logout </a>
       </div>
     </header>
-    <div class="dashboard">
-      <div class="card">
-        <h3>Total Devices</h3>
-        <p>{{ total_devices }}</p>
-      </div>
 
-      <div class="card">
-        <h3>Available</h3>
-        <p>{{ available }}</p>
-      </div>
-
-      <div class="card">
-        <h3>Low Stock</h3>
-        <p>{{ low_stock }}</p>
-      </div>
-
-      <div class="card">
-        <h3>Out Of Stock</h3>
-        <p>{{ out_of_stock }}</p>
-      </div>
-    </div>
     <div class="searchContainer">
       <input type="text" id="searchInput" placeholder="Search products..." />
     </div>
@@ -76,6 +56,10 @@
       </div>
     </div>
 
+    <video id="handVideo" autoplay playsinline muted webkit-playsinline style="display:none;"></video>
+    <canvas id="handCanvas" style="display:none;"></canvas>
+
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/camera.js') }}"></script>
   </body>
 </html>

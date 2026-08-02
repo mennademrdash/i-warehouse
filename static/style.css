@@ -22,7 +22,7 @@ header {
 }
 .container {
   display: flex;
-  height: calc(100vh - 84px);
+  min-height: calc(100vh - 84px);
 }
 
 .sidebar {
@@ -37,9 +37,7 @@ header {
 
   border-right: 1px solid #ddd;
 
-  height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
+  align-self: flex-start;
 }
 .sidebar h2 {
   font-size: 24px;
@@ -145,9 +143,6 @@ header {
   font-size: 16px;
   border-radius: 10px;
 }
-/* ===========================
-   Login & Register
-=========================== */
 
 .auth-container {
   width: 100%;
@@ -271,23 +266,27 @@ header {
   margin: 20px;
   flex-wrap: wrap;
 }
-
-.card {
-  width: 180px;
-  background: #ffffff;
-  border-radius: 10px;
-  padding: 20px;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+.login-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
-.card h3 {
-  margin-bottom: 10px;
-  color: #444;
-}
-
-.card p {
-  font-size: 28px;
+.login-tabs button {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  background: #f4f6f9;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
   font-weight: bold;
-  color: #d60000;
+  color: #555;
+  transition: 0.3s;
+}
+
+.login-tabs button.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
 }

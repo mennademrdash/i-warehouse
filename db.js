@@ -101,7 +101,7 @@ export function updateDevice(id, updates) {
 
 export function deleteDevice(id) {
   const result = db.prepare("DELETE FROM devices WHERE id = ?").run(id);
-  return result.changes > 0; // true لو اتحذف فعلاً، false لو مكانش موجود أصلاً
+  return result.changes > 0; 
 }
 
 export function closeDB() {

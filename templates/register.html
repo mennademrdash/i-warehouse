@@ -3,24 +3,25 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Register</title>
+    <title>Register - i Warehouse</title>
 
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}"
     />
   </head>
-
   <body>
     <div class="auth-container">
       <div class="auth-box">
         <h2>Register</h2>
 
-        <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %} {% if
-        messages %} {% for category, message in messages %}
-        <div class="alert {{ category }}">{{ message }}</div>
-        {% endfor %} {% endif %} {% endwith %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert {{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
 
         <form method="POST">
           <input
@@ -47,6 +48,21 @@
             required
           />
 
+          <video
+            id="registerVideo"
+            autoplay
+            playsinline
+            style="width:100%; border-radius:8px; margin-bottom:15px; display:block;"
+          ></video>
+          <canvas id="registerCanvas" style="display:none;"></canvas>
+
+          <button type="button" id="captureFace">📷 Capture Face</button>
+          <p id="faceStatus" style="text-align:center; margin:10px 0;">
+            ❌ No face captured
+          </p>
+
+          <input type="hidden" id="face_encoding" name="face_encoding" />
+
           <button type="submit">Register</button>
         </form>
 
@@ -56,6 +72,7 @@
         </p>
       </div>
     </div>
+
+    <script src="{{ url_for('static', filename='js/camera.js') }}"></script>
   </body>
 </html>
-<script src="{{ url_for('static', filename='script.js') }}"></script>
