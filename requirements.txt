@@ -31,3 +31,5 @@ setuptools==81.0.0
 six==1.17.0
 sounddevice==0.5.5
 Werkzeug==3.1.8
+waitress==3.0.2
+locust==2.32.4

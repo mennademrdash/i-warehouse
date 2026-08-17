@@ -290,3 +290,181 @@ header {
   color: white;
   border-color: #007bff;
 }
+
+.gesture-badge {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  z-index: 1000;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.gesture-badge.active {
+  background: rgba(0, 123, 255, 0.95);
+  transform: scale(1.05);
+}
+/* Settings */
+
+.settings-page {
+  width: 700px;
+  max-width: 90%;
+  margin: 40px auto;
+}
+
+.settings-card {
+  background: white;
+  padding: 25px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+}
+
+.setting-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.setting-title h2 {
+  margin: 0 0 6px;
+}
+
+.setting-title p {
+  margin: 0;
+  color: #666;
+}
+
+.toggle {
+  position: relative;
+  width: 50px;
+  height: 26px;
+}
+
+.toggle input {
+  display: none;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  background: #ccc;
+  border-radius: 30px;
+  cursor: pointer;
+}
+
+.slider::before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  left: 3px;
+  top: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.toggle input:checked + .slider {
+  background: #111;
+}
+
+.toggle input:checked + .slider::before {
+  transform: translateX(24px);
+}
+
+.toggle.disabled {
+  opacity: 0.6;
+}
+
+.face-content {
+  display: none;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
+}
+
+.face-box {
+  width: 320px;
+  margin: auto;
+  text-align: center;
+}
+
+#cameraPreview {
+  width: 100%;
+  height: 240px;
+  background: #111;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+#cameraCanvas {
+  display: none;
+}
+
+.capture-btn {
+  margin-top: 15px;
+  padding: 11px 22px;
+  border: none;
+  border-radius: 7px;
+  background: #111;
+  color: white;
+  cursor: pointer;
+}
+
+.status {
+  margin-top: 12px;
+  min-height: 20px;
+}
+
+.account-fields {
+  margin-top: 20px;
+}
+
+.account-fields label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.account-fields input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.save-btn {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 8px;
+  background: #e31b23;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+.header-right a[href="/settings"] {
+  color: white;
+  text-decoration: none;
+  background: #111;
+  border: 2px solid #e31b23;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.header-right a[href="/settings"]:hover {
+  background: #e31b23;
+  color: white;
+  transform: translateY(-2px);
+}

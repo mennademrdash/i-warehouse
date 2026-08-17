@@ -256,9 +256,10 @@ function setupLoginTabs() {
 async function setupHandScroll() {
     const video = document.getElementById("handVideo");
     const canvas = document.getElementById("handCanvas");
-    const SCROLL_DISTANCE = Math.round(window.innerHeight * 0.6);
-    const POLL_MS = 120;
-    const MAX_FRAME_WIDTH = 320;
+    const gestureBadge = document.getElementById("gestureBadge");
+    const SCROLL_DISTANCE = Math.round(window.innerHeight * 0.5);
+    const POLL_MS = 300;
+    const MAX_FRAME_WIDTH =240;
 
     if (!video || !canvas) return;
 
@@ -270,6 +271,7 @@ async function setupHandScroll() {
 
         if (!isCameraSupported()) {
             console.warn("[hand-scroll]", getCameraErrorMessage({ name: "Unsupported" }));
+            if (gestureBadge) gestureBadge.textContent = "⚠️ Camera unsupported";
             return false;
         }
 
@@ -283,10 +285,11 @@ async function setupHandScroll() {
                 },
             });
             await attachStreamToVideo(video, handScrollStream);
+            if (gestureBadge) gestureBadge.textContent = "✋ Gesture Control Active";
             return true;
         } catch (err) {
             console.error("[hand-scroll] Camera error:", err);
-            console.warn("[hand-scroll]", getCameraErrorMessage(err));
+            if (gestureBadge) gestureBadge.textContent = "⚠️ Camera offline";
             return false;
         }
     }
@@ -308,7 +311,7 @@ async function setupHandScroll() {
 
             const ctx = canvas.getContext("2d");
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const imageData = canvas.toDataURL("image/jpeg", 0.55);
+            const imageData = canvas.toDataURL("image/jpeg", 0.34);
 
             try {
                 const response = await fetch("/api/hand-command", {
@@ -324,10 +327,20 @@ async function setupHandScroll() {
 
                 const data = await response.json();
 
+                if (gestureBadge) {
+                    if (data.gesture && data.gesture !== "No Hand" && data.gesture !== "Unknown") {
+                        gestureBadge.textContent = `${data.gesture} (${data.command})`;
+                        gestureBadge.classList.add("active");
+                    } else {
+                       //gestureBadge.textContent = "✋ Gesture Control Active";
+                        gestureBadge.classList.remove("active");
+                    }
+                }
+
                 if (data.command === "SCROLL_UP") {
-                    window.scrollBy({ top: -SCROLL_DISTANCE, left: 0, behavior: "auto" });
+                    window.scrollBy({ top: -SCROLL_DISTANCE, left: 0, behavior: "smooth" });
                 } else if (data.command === "SCROLL_DOWN") {
-                    window.scrollBy({ top: SCROLL_DISTANCE, left: 0, behavior: "auto" });
+                    window.scrollBy({ top: SCROLL_DISTANCE, left: 0, behavior: "smooth" });
                 }
             } catch (err) {
                 console.error("[hand-scroll] Hand command error:", err);

@@ -34,27 +34,29 @@ def load_known_faces(known_dir: str = KNOWN_FACES_DIR):
 
     return known_encodings, known_names
 
-
+#- Processor = object mas2ool 3an kol 3amalyat Face Recognition. 
 class FaceRecognitionProcessor:
-
+# Constructor bytetsada automatic awel ma ne3mel object.
     def __init__(self, known_dir: str = KNOWN_FACES_DIR, tolerance: float = 0.6):
         self.known_encodings, self.known_names = load_known_faces(known_dir)
-        self.tolerance = tolerance
+        #> Da threshold lel matching.
+        self.tolerance = tolerance #aw el distance <= tolerance, lel matching.
         print(f"✅ Loaded {len(self.known_names)} known face(s): {self.known_names}")
 
     def process_frame(self, frame):
+         #is an OpenCV flag used to convert an image's color space from BGR (Blue, Green, Red) to RGB (Red, Green, Blue).
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
+#=> Bytetsada makan kol face, btzyd les encodings.
         face_locations = face_recognition.face_locations(rgb_frame)
         face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
 
         faces_result = []
-
+#=> Loop 3ala kol face.
         for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
 
             name = "Unknown"
             confidence = 0.0
-
+#=> By7seb el distance ben el face el gdid w kol known faces.
             if len(self.known_encodings) > 0:
                 face_distances = face_recognition.face_distance(
                     self.known_encodings, face_encoding
@@ -87,8 +89,13 @@ class FaceRecognitionProcessor:
 
 
 if __name__ == "__main__":
-    processor = FaceRecognitionProcessor()
-    cap = cv2.VideoCapture(0)
+    processor = PoseProcessor()
+    camera_source = os.getenv("CAMERA_URL", "0")
+    try:
+        camera_source = int(camera_source)
+    except ValueError:
+        pass
+    cap = cv2.VideoCapture(camera_source)
 
     while True:
         ret, frame = cap.read()

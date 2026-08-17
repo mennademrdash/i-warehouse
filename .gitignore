@@ -6,4 +6,8 @@ Include/
 Lib/
 Scripts/
 share/
-pyvenv.cfg
+pyvenv.cfgx 
+.env
+venv/
+__pycache__/
+*.pyc

@@ -16,10 +16,16 @@
       <h1><span class="logo-i">i</span>-WareHouse</h1>
 
       <div class="header-right">
-        <span class="welcome"> Welcome, {{ session["username"] }} </span>
-
-        <a href="{{ url_for('auth.logout') }}" class="logout-btn"> Logout </a>
-      </div>
+        <span class="welcome">Welcome, {{ session["username"] }}</span>
+    
+        <a href="/settings" class="settings-btn">
+          ⚙ Settings
+      </a>
+    
+        <a href="{{ url_for('auth.logout') }}" class="logout-btn">
+            Logout
+        </a>
+    </div>
     </header>
 
     <div class="searchContainer">
@@ -56,7 +62,7 @@
       </div>
     </div>
 
-    <video id="handVideo" autoplay playsinline muted webkit-playsinline style="display:none;"></video>
+    <video id="handVideo" autoplay playsinline muted style="display:none;"></video>
     <canvas id="handCanvas" style="display:none;"></canvas>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
