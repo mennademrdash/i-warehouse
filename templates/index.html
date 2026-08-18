@@ -1,31 +1,71 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>i Warehouse</title>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>i Warehouse</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-</head>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
 
-<body>
-  <header>
-    <h1><span class="logo-i">i</span>-WareHouse</h1>
-  </header>
-  <div class="container">
-    <div id="sidebar" class="sidebar">
-      <h2>Items</h2>
+  <body>
+    <header>
+      <h1><span class="logo-i">i</span>-WareHouse</h1>
+
+      <div class="header-right">
+        <span class="welcome">Welcome, {{ session["username"] }}</span>
+    
+        <a href="/settings" class="settings-btn">
+          ⚙ Settings
+      </a>
+    
+        <a href="{{ url_for('auth.logout') }}" class="logout-btn">
+            Logout
+        </a>
     </div>
-    <div id="content" class="content">
-      <div id="backgroundImage" aria-hidden="true"></div>
-      <div id="contentOverlay" aria-hidden="true"></div>
-      <div class="contentText">
-        <h2 id="mainTitle"></h2>
-        <p id="mainDescription"></p>
+    </header>
+
+    <div class="searchContainer">
+      <input type="text" id="searchInput" placeholder="Search products..." />
+    </div>
+
+    <div class="container">
+      <div id="sidebar" class="sidebar">
+        <h2>Items</h2>
+
+        <label for="categoryFilter">Category</label>
+
+        <select id="categoryFilter">
+          <option value="">All Categories</option>
+          <option value="Camera">Camera</option>
+          <option value="Microcontroller">Microcontroller</option>
+          <option value="Power Supply">Power Supply</option>
+          <option value="Cable">Cable</option>
+          <option value="Relay">Relay</option>
+          <option value="Wi-Fi Module">Wi-Fi Module</option>
+          <option value="IC">IC</option>
+        </select>
+      </div>
+
+      <div id="content" class="content">
+        <div id="backgroundImage"></div>
+
+        <div id="contentOverlay"></div>
+
+        <div class="contentText">
+          <h2 id="mainTitle"></h2>
+          <p id="mainDescription"></p>
+        </div>
       </div>
     </div>
-  </div>
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
 
+    <video id="handVideo" autoplay playsinline muted style="display:none;"></video>
+    <canvas id="handCanvas" style="display:none;"></canvas>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/camera.js') }}"></script>
+  </body>
 </html>

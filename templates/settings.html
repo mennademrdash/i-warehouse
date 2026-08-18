@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Settings - i-WareHouse</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+
+    <header class="header">
+
+        <h1>
+            <span>i</span>-WareHouse
+        </h1>
+
+        <a href="/" class="back">
+            ← Back
+        </a>
+
+    </header>
+
+
+    <div class="settings-page">
+
+
+        <section class="settings-card">
+
+            <div class="setting-header">
+
+                <div class="setting-title">
+
+                    <h2>
+                        Face Authentication
+                    </h2>
+
+                    <p>
+                        Use your face to authenticate.
+                    </p>
+
+                </div>
+
+
+                <label class="toggle">
+
+                    <input
+                        type="checkbox"
+                        id="faceToggle"
+                        {% if face_enabled %}checked{% endif %}
+                    >
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+
+            <div
+                class="face-content"
+                id="faceContent"
+            >
+
+                <div class="face-box">
+
+                    <video
+                        id="cameraPreview"
+                        autoplay
+                        muted
+                        playsinline
+                    ></video>
+
+
+                    <canvas
+                        id="cameraCanvas"
+                    ></canvas>
+
+
+                    <button
+                        type="button"
+                        id="captureFaceBtn"
+                        class="capture-btn"
+                    >
+                        📷 Capture Face
+                    </button>
+
+
+                    <div
+                        id="faceStatus"
+                        class="status"
+                    ></div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="settings-card">
+
+            <div class="setting-header">
+
+                <div class="setting-title">
+
+                    <h2>
+                        Username / Password
+                    </h2>
+
+                </div>
+
+
+                <label class="toggle disabled">
+
+                    <input
+                        type="checkbox"
+                        checked
+                        disabled
+                    >
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+
+            <div class="account-fields">
+
+                <label>
+                    Username
+                </label>
+
+                <input
+                    type="text"
+                    id="username"
+                    value="{{ session['username'] }}"
+                    readonly
+                >
+
+            </div>
+
+        </section>
+
+
+        <section class="settings-card">
+
+            <button
+                type="button"
+                id="saveSettingsBtn"
+                class="save-btn"
+            >
+                Save Changes
+            </button>
+
+        </section>
+
+
+    </div>
+
+
+    <script src="{{ url_for('static', filename='js/camera.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+
+</body>
+
+</html>
