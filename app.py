@@ -1,10 +1,13 @@
 from flask import Flask, render_template, jsonify, request, session, redirect, Response
 import os
+_vendor_lib_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vendor_libs")
+os.environ["LD_LIBRARY_PATH"] = _vendor_lib_path + ":" + os.environ.get("LD_LIBRARY_PATH", "")
 import json
 import time
 import threading
 import face_recognition
 import cv2
+
 
 from auth import auth, decode_base64_image
 from db import get_db, init_db
@@ -38,10 +41,12 @@ def home():
     return render_template("index.html")
 
 
+_init_lock = threading.Lock()
+
 def _get_hand_processor():
     global _hand_processor
     if _hand_processor is None:
-        with _hand_lock:
+        with _init_lock:
             if _hand_processor is None:
                 _hand_processor = HandGestureProcessor()
     return _hand_processor
