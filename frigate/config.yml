@@ -1,0 +1,30 @@
+mqtt:
+  enabled: false
+
+cameras:
+  hikvision:
+    enabled: true
+
+    ffmpeg:
+      inputs:
+        - path: rtsp://admin:Amr%402026@192.168.2.200:554/Streaming/Channels/102
+          roles:
+            - detect
+
+    detect:
+      enabled: true
+      width: 640
+      height: 360
+      fps: 5
+version: 0.17-0
+semantic_search:
+  enabled: false
+  model_size: small
+face_recognition:
+  enabled: true
+  model_size: small
+lpr:
+  enabled: true
+classification:
+  bird:
+    enabled: true
