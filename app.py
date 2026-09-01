@@ -13,6 +13,9 @@ import json
 import time
 import threading
 import logging
+import io
+import numpy as np
+import requests
 from functools import wraps
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -27,9 +30,12 @@ from db import (
     init_db,
     create_order,
     get_order,
+    get_order_events,
     update_order_status,
     get_active_order,
     update_inventory,
+    flag_order,
+    get_all_face_encodings,
 )
 from hand_gesture.hand_recognition import HandGestureProcessor
 
@@ -61,8 +67,30 @@ MQTT_BROKER = os.getenv("MQTT_BROKER", "localhost")
 MQTT_PORT = int(os.getenv("MQTT_PORT", "1883"))
 MQTT_TOPIC = os.getenv("MQTT_TOPIC", "frigate/events")
 
-PICKUP_ZONE = os.getenv("PICKUP_ZONE", "pickup_zone")
-DROPOFF_ZONE = os.getenv("DROPOFF_ZONE", "dropoff_zone")
+PICKUP_ZONE = os.getenv(
+    "PICKUP_ZONE",
+    "i-core-room"
+)
+
+DROPOFF_ZONE = os.getenv(
+    "DROPOFF_ZONE",
+    "i-warehouse"
+)
+
+# Frigate's own web/API port on the host. Not 5000 -- that's occupied by
+# this Flask app. See docker-compose.yml (frigate ports: "5001:5000").
+FRIGATE_URL = os.getenv("FRIGATE_URL", "http://localhost:5001")
+
+# Lower = stricter match. 0.6 is face_recognition's own default;
+# 0.5 trades a few more "unknown" false negatives for fewer wrong matches,
+# which is the safer direction for something gating a physical handoff.
+FACE_MATCH_TOLERANCE = float(os.getenv("FACE_MATCH_TOLERANCE", "0.5"))
+
+# Supported item types -- constrained to what the default Frigate/COCO
+# model can actually recognize as a visual object. This does NOT yet
+# verify the item itself was carried -- see _handle_pickup/_handle_arrival
+# docstrings for the current scope boundary.
+SUPPORTED_ITEM_TYPES = ["laptop", "backpack", "suitcase", "handbag", "cell phone"]
 
 
 # FLASK APPLICATION
@@ -295,15 +323,105 @@ def on_mqtt_message(client, userdata, msg):
 
     zones = after.get("current_zones", [])
     camera = after.get("camera")
+    event_id = after.get("id")
 
     if PICKUP_ZONE in zones:
-        _handle_pickup(camera)
+        _handle_pickup(camera, event_id)
 
     elif DROPOFF_ZONE in zones:
-        _handle_arrival(camera)
+        _handle_arrival(camera, event_id)
 
 
-def _handle_pickup(camera):
+def _identify_person_from_snapshot(event_id: str):
+    """Fetches the Frigate snapshot for this detection event and matches
+    it against every registered user's stored face encoding.
+
+    Returns {"user_id": ..., "username": ...} on a match, or None if the
+    snapshot couldn't be fetched, no face was found in it, or no known
+    user matched within FACE_MATCH_TOLERANCE.
+
+    This is a synchronous network + CPU-bound call running inside the
+    MQTT callback thread. Fine for a single-camera prototype with
+    infrequent events; would need to move to a worker queue before this
+    handles multiple cameras firing concurrently.
+    """
+
+    try:
+
+        response = requests.get(
+            f"{FRIGATE_URL}/api/events/{event_id}/snapshot.jpg",
+            timeout=5,
+        )
+
+        response.raise_for_status()
+
+    except requests.RequestException:
+
+        logger.exception(
+            "Could not fetch Frigate snapshot for event %s",
+            event_id
+        )
+
+        return None
+
+    try:
+
+        image = face_recognition.load_image_file(
+            io.BytesIO(response.content)
+        )
+
+        unknown_encodings = face_recognition.face_encodings(image)
+
+    except Exception:
+
+        logger.exception(
+            "Could not process snapshot for event %s",
+            event_id
+        )
+
+        return None
+
+    if not unknown_encodings:
+
+        logger.info(
+            "No face found in snapshot for event %s",
+            event_id
+        )
+
+        return None
+
+    unknown_encoding = unknown_encodings[0]
+
+    for user_id, username, encoding_list in get_all_face_encodings():
+
+        known_encoding = np.array(encoding_list)
+
+        matches = face_recognition.compare_faces(
+            [known_encoding],
+            unknown_encoding,
+            tolerance=FACE_MATCH_TOLERANCE,
+        )
+
+        if matches[0]:
+
+            return {
+                "user_id": user_id,
+                "username": username,
+            }
+
+    return None
+
+
+def _handle_pickup(camera, event_id):
+    """Advances a PENDING order to IN_TRANSIT, but only if the person
+    detected at pickup can be identified against a registered user.
+
+    Item-type verification is NOT performed here -- the system trusts
+    that the item selected at order creation matches what's physically
+    picked up. Confirming that visually (cross-referencing an item-class
+    detection with the person in the same frame) is a documented next
+    step, not implemented yet.
+    """
 
     order = get_active_order(status="PENDING")
 
@@ -316,16 +434,42 @@ def _handle_pickup(camera):
 
         return
 
-    update_order_status(order["id"], "IN_TRANSIT")
+    person = _identify_person_from_snapshot(event_id)
+
+    if person is None:
+
+        flag_order(
+            order["id"],
+            reason=f"Unrecognized person at pickup (camera: {camera})"
+        )
+
+        logger.warning(
+            "Order %s FLAGGED: unrecognized person at pickup on %s",
+            order["id"],
+            camera
+        )
+
+        return
+
+    update_order_status(
+        order["id"],
+        "IN_TRANSIT",
+        actor_user_id=person["user_id"]
+    )
 
     logger.info(
-        "Order %s -> IN_TRANSIT (pickup detected on %s)",
+        "Order %s -> IN_TRANSIT (picked up by %s on %s)",
         order["id"],
+        person["username"],
         camera
     )
 
 
-def _handle_arrival(camera):
+def _handle_arrival(camera, event_id):
+    """Advances an IN_TRANSIT order to COMPLETED and updates inventory,
+    but only if the person detected at arrival can be identified against
+    a registered user. See _handle_pickup for the item-type caveat.
+    """
 
     order = get_active_order(status="IN_TRANSIT")
 
@@ -338,13 +482,35 @@ def _handle_arrival(camera):
 
         return
 
-    update_order_status(order["id"], "COMPLETED")
+    person = _identify_person_from_snapshot(event_id)
+
+    if person is None:
+
+        flag_order(
+            order["id"],
+            reason=f"Unrecognized person at arrival (camera: {camera})"
+        )
+
+        logger.warning(
+            "Order %s FLAGGED: unrecognized person at arrival on %s",
+            order["id"],
+            camera
+        )
+
+        return
+
+    update_order_status(
+        order["id"],
+        "COMPLETED",
+        actor_user_id=person["user_id"]
+    )
 
     update_inventory(order["device_name"], order["qty"])
 
     logger.info(
-        "Order %s -> COMPLETED, inventory updated (arrival on %s)",
+        "Order %s -> COMPLETED (received by %s on %s), inventory updated",
         order["id"],
+        person["username"],
         camera
     )
 
@@ -624,7 +790,33 @@ def get_products():
     return response
 
 
+# HANDOFF DASHBOARD PAGE
+
+@app.route(
+    "/handoff"
+)
+@login_required_page
+def handoff_page():
+
+    return render_template(
+        "handoff.html"
+    )
+
+
 # ORDERS API (delivery pickup and handoff)
+
+@app.route(
+    "/api/orders/item-types",
+    methods=["GET"]
+)
+@login_required_api
+def get_item_types():
+
+    return jsonify({
+        "success": True,
+        "item_types": SUPPORTED_ITEM_TYPES
+    })
+
 
 @app.route(
     "/api/orders",
@@ -636,8 +828,25 @@ def create_order_route():
 
     data = request.get_json(silent=True) or {}
 
-    device_name = (data.get("device_name") or "").strip()
+    device_name = (
+        data.get("device_name") or ""
+    ).strip()
+
     qty = data.get("qty")
+
+    item_type = (
+        data.get("item_type") or ""
+    ).strip()
+
+    source_zone = (
+        data.get("source_zone")
+        or PICKUP_ZONE
+    ).strip()
+
+    destination_zone = (
+        data.get("destination_zone")
+        or DROPOFF_ZONE
+    ).strip()
 
     if not device_name:
 
@@ -653,11 +862,29 @@ def create_order_route():
             "message": "qty must be a positive integer"
         }), 400
 
-    order_id = create_order(device_name, qty)
+    if item_type not in SUPPORTED_ITEM_TYPES:
+
+        return jsonify({
+            "success": False,
+            "message": (
+                "item_type must be one of: "
+                + ", ".join(SUPPORTED_ITEM_TYPES)
+            )
+        }), 400
+
+    order_id = create_order(
+        device_name=device_name,
+        qty=qty,
+        item_type=item_type,
+        requested_by_user_id=session["user_id"],
+        source_zone=source_zone,
+        destination_zone=destination_zone
+    )
 
     logger.info(
-        "Order %s created: %s x%s",
+        "Order %s created by user %s: %s x%s",
         order_id,
+        session["user_id"],
         device_name,
         qty
     )
@@ -665,7 +892,7 @@ def create_order_route():
     return jsonify({
         "success": True,
         "order_id": order_id,
-        "status": "PENDING"
+        "status": "CREATED"
     }), 201
 
 
@@ -685,9 +912,12 @@ def get_order_route(order_id):
             "message": "Order not found"
         }), 404
 
+    events = get_order_events(order_id)
+
     return jsonify({
         "success": True,
-        "order": order
+        "order": order,
+        "events": events
     })
 
 
