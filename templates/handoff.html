@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>i-Warehouse — Order Tracking</title>
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <style>
+
+        :root {
+            --bg: #0f1115;
+            --panel: #171a21;
+            --border: #2a2e38;
+            --text: #e6e8ec;
+            --muted: #9aa0ab;
+            --accent: #4f8cff;
+            --success: #45c46b;
+            --warning: #e7c85a;
+            --danger: #ff6262;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                sans-serif;
+        }
+
+        .container {
+            width: min(1100px, 94%);
+            margin: 35px auto;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            margin-top: 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 20px;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            background: #10131a;
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            padding: 11px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            width: 100%;
+            border: none;
+            border-radius: 7px;
+            padding: 12px;
+            background: var(--accent);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        button:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge.CREATED {
+            background: #393522;
+            color: var(--warning);
+        }
+
+        .badge.PICKED_UP,
+        .badge.IN_TRANSIT {
+            background: #20344b;
+            color: #75b1ff;
+        }
+
+        .badge.ARRIVED,
+        .badge.HANDOFF {
+            background: #29384a;
+            color: #80d2ff;
+        }
+
+        .badge.COMPLETED {
+            background: #1e3b28;
+            color: var(--success);
+        }
+
+        .badge.TIMED_OUT {
+            background: #3a2020;
+            color: var(--danger);
+        }
+
+        .meta {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .timeline {
+            margin-top: 20px;
+        }
+
+        .event {
+            position: relative;
+            border-left: 2px solid var(--border);
+            padding: 0 0 20px 20px;
+            margin-left: 7px;
+        }
+
+        .event::before {
+            content: "";
+            position: absolute;
+            left: -6px;
+            top: 0;
+            width: 10px;
+            height: 10px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        .event-title {
+            font-weight: 600;
+        }
+
+        .event-meta {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .camera {
+            width: 100%;
+            border-radius: 8px;
+            display: block;
+            background: black;
+        }
+
+        .flag {
+            display: none;
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 7px;
+            background: #3a2020;
+            border: 1px solid #672b2b;
+            color: #ff8989;
+        }
+
+        .empty {
+            color: var(--muted);
+            text-align: center;
+            padding: 30px;
+        }
+
+        @media (max-width: 800px) {
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <h1>i-Warehouse Order Tracking</h1>
+
+    <p class="subtitle">
+        Create an order and track the complete delivery journey.
+    </p>
+
+
+    <div class="grid">
+
+
+        <!-- ========================================= -->
+        <!-- CREATE ORDER -->
+        <!-- ========================================= -->
+
+        <div>
+
+            <div class="panel">
+
+                <h3>Create Order</h3>
+
+                <label>
+                    Item Type
+                </label>
+
+                <select id="item_type">
+                </select>
+
+
+                <label>
+                    Device / Item Name
+                </label>
+
+                <input
+                    id="device_name"
+                    type="text"
+                    placeholder="e.g. Laptop"
+                >
+
+
+                <label>
+                    Quantity
+                </label>
+
+                <input
+                    id="qty"
+                    type="number"
+                    min="1"
+                    value="1"
+                >
+
+
+                <label>
+                    Source Zone
+                </label>
+
+                <input
+                    id="source_zone"
+                    value="i-core-room"
+                >
+
+
+                <label>
+                    Destination Zone
+                </label>
+
+                <input
+                    id="destination_zone"
+                    value="i-warehouse"
+                >
+
+
+                <button
+                    id="submitBtn"
+                    onclick="createOrder()"
+                >
+                    Create Order
+                </button>
+
+
+                <div
+                    id="error"
+                    style="
+                        display:none;
+                        color:#ff6b6b;
+                        margin-top:12px;
+                    "
+                ></div>
+
+            </div>
+
+
+            <!-- ===================================== -->
+            <!-- CAMERA -->
+            <!-- ===================================== -->
+
+            <div class="panel">
+
+                <h3>Live Camera</h3>
+
+                <img
+                    class="camera"
+                    src="{{ url_for('video_feed') }}"
+                    alt="Live Camera"
+                >
+
+            </div>
+
+        </div>
+
+
+        <!-- ========================================= -->
+        <!-- TRACKER -->
+        <!-- ========================================= -->
+
+        <div>
+
+            <div
+                class="panel"
+                id="tracker"
+                style="display:none;"
+            >
+
+                <div class="order-header">
+
+                    <div>
+
+                        <h2>
+                            Order #
+                            <span id="orderId"></span>
+                        </h2>
+
+                        <div
+                            class="meta"
+                            id="orderInfo"
+                        ></div>
+
+                    </div>
+
+
+                    <span
+                        id="statusBadge"
+                        class="badge"
+                    >
+                    </span>
+
+                </div>
+
+
+                <!-- FLAG -->
+
+                <div
+                    id="flagAlert"
+                    class="flag"
+                ></div>
+
+
+                <!-- TIMELINE -->
+
+                <div class="timeline">
+
+                    <h3>
+                        Order Timeline
+                    </h3>
+
+                    <div id="timeline">
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="panel"
+                id="emptyState"
+            >
+
+                <div class="empty">
+
+                    Create an order to start tracking.
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="{{ url_for(
+    'static',
+    filename='js/handoff.js'
+) }}"></script>
+
+</body>
+
+</html>

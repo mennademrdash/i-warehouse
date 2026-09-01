@@ -1,0 +1,25 @@
+1788203766: mosquitto version 2.1.2 starting
+1788203766: Config loaded from /mosquitto/config/mosquitto.conf.
+1788203766: Bridge support available.
+1788203766: Persistence support available.
+1788203766: TLS support available.
+1788203766: TLS-PSK support available.
+1788203766: Websockets support available.
+1788203766: Opening ipv4 listen socket on port 1883.
+1788203766: Opening ipv6 listen socket on port 1883.
+1788203766: mosquitto version 2.1.2 running
+1788203805: New connection from 172.20.0.1:58290 on port 1883.
+1788203805: New client connected from 172.20.0.1:58290 as auto-465B8711-02EF-01B5-42C2-0B05EC6F2968 (p4, c1, k60).
+1788204082: New connection from 172.20.0.1:38112 on port 1883.
+1788204082: New client connected from 172.20.0.1:38112 as auto-715013C0-B681-9350-C6C6-515BA9F1388E (p4, c1, k10).
+1788204083: Client auto-715013C0-B681-9350-C6C6-515BA9F1388E [172.20.0.1:38112] disconnected.
+1788204133: New connection from 172.20.0.1:40744 on port 1883.
+1788204133: New client connected from 172.20.0.1:40744 as auto-AFA46B85-29A6-1C64-683F-BD3E0A53EF7A (p4, c1, k10).
+1788204134: Client auto-465B8711-02EF-01B5-42C2-0B05EC6F2968 [172.20.0.1:58290] disconnected: connection closed by client.
+1788204134: Client auto-AFA46B85-29A6-1C64-683F-BD3E0A53EF7A [172.20.0.1:40744] disconnected.
+1788204279: New connection from 172.20.0.1:36686 on port 1883.
+1788204279: New client connected from 172.20.0.1:36686 as auto-2439260B-26E5-E188-36CE-8B631168F354 (p4, c1, k60).
+1788204425: Client auto-2439260B-26E5-E188-36CE-8B631168F354 [172.20.0.1:36686] disconnected: connection closed by client.
+1788204444: New connection from 172.20.0.1:34740 on port 1883.
+1788204444: New client connected from 172.20.0.1:34740 as auto-A31B49A1-7994-1E7D-EF33-18A3256C069F (p4, c1, k60).
+1788204499: Client auto-A31B49A1-7994-1E7D-EF33-18A3256C069F [172.20.0.1:34740] disconnected: connection closed by client.
